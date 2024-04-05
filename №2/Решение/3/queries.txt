@@ -1,0 +1,2 @@
+SELECT * FROM Orders WHERE EmployeeID = 4;
+SELECT * FROM Products WHERE Unit LIKE '%box%';

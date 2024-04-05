@@ -1,0 +1,5062 @@
+{
+	"info": {
+		"_postman_id": "9a8c1b36-00b1-490a-adcb-5a1d98206509",
+		"name": "LIIS тестовое задание",
+		"description": "Команда занимается разработкой API для форума. В базовом функционале доступны методы для авторизации, создания и редактирования постов, отправки комментариев. В процессе ревью команда приняла решение добавить во вторую версию приложения функционал модератора с правами редактирования/удаления постов пользователей, а также провести рефакторинг приложения. Ваша задача написать регресс-тесты для первой версии приложения, позволяющие выявить отличие в ответах новой версии. Из за сжатых сроков команда оказалась невнимательна и допустила ошибки в новом релизе - их вам также необходимо выявить.\n\nВ качестве ответа, пожалуйста, пришлите:  \n1\\. Коллекцию автотестов, составленную в Postman или на Python.  \n2\\. Текстовый файл/таблицу с обнаруженными багами.  \n3\\. Текстовый файл/таблицу с обнаруженными изменениями.\n\nДокументация по обеим версиям находится по адресу  \n[https://documenter.getpostman.com/view/12942518/TzY4fvEG](https://documenter.getpostman.com/view/12942518/TzY4fvEG)\n\nВместо поля в запросах указывайте ваш почтовый ящик\n\nТесты предпочтительнее составить в Postman, но выбор остается за вами.УЗ  \nАдминистратора  \nЛогин: admin  \nПароль: 123",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33637374"
+	},
+	"item": [
+		{
+			"name": "LIIS Test v.1",
+			"item": [
+				{
+					"name": "sign-in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"let req = JSON.parse(pm.request.body);",
+									"",
+									"if (jsonData.hasOwnProperty(\"id\")) {",
+									"    pm.collectionVariables.set(\"userId\", jsonData.id);",
+									"    pm.collectionVariables.set(\"username\", req.username);",
+									"    pm.collectionVariables.set(\"email\", req.email);",
+									"    pm.collectionVariables.set(\"password\", req.password);",
+									"}",
+									"",
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"password\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"first_name\": {",
+									"      \"type\": \"null\"",
+									"    },",
+									"    \"is_admin\": {",
+									"      \"type\": \"boolean\"",
+									"    },",
+									"    \"last_name\": {",
+									"      \"type\": \"null\"",
+									"    },",
+									"    \"id\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"username\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"middle_name\": {",
+									"      \"type\": \"null\"",
+									"    },",
+									"    \"email\": {",
+									"      \"type\": \"string\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"password\",",
+									"    \"first_name\",",
+									"    \"is_admin\",",
+									"    \"last_name\",",
+									"    \"id\",",
+									"    \"username\",",
+									"    \"middle_name\",",
+									"    \"email\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomExampleEmail}}\",\n    \"password\": \"{{$randomPassword}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api//{{tester}}/sign-in",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"",
+								"{{tester}}",
+								"sign-in"
+							]
+						},
+						"description": "Required fields: username, email, password"
+					},
+					"response": []
+				},
+				{
+					"name": "Post post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"if (jsonData.hasOwnProperty(\"id\")) {",
+									"    pm.collectionVariables.set(\"postId\", jsonData.id);",
+									"}",
+									"",
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"content\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"author\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"publication_datetime\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"name\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"id\": {",
+									"      \"type\": \"integer\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"content\",",
+									"    \"author\",",
+									"    \"publication_datetime\",",
+									"    \"name\",",
+									"    \"id\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"yourpostname\",\n    \"content\": \"yourpostcontent\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/posts",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"author\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"content\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"id\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"name\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"publication_datetime\": {",
+									"      \"type\": \"string\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"author\",",
+									"    \"content\",",
+									"    \"id\",",
+									"    \"name\",",
+									"    \"publication_datetime\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/post/{{postId}}",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"post",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSchema = {",
+									"  \"type\": \"array\",",
+									"  \"items\": [",
+									"    {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"content\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"author\": {",
+									"          \"type\": \"integer\"",
+									"        },",
+									"        \"publication_datetime\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"name\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"id\": {",
+									"          \"type\": \"integer\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"content\",",
+									"        \"author\",",
+									"        \"publication_datetime\",",
+									"        \"name\",",
+									"        \"id\"",
+									"      ]",
+									"    }",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/posts",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Put post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"message\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"type\": {",
+									"      \"type\": \"string\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"message\",",
+									"    \"type\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"yournewpostdsadsadsadsadasname\",\n    \"content\": \"yournewpostcontent\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/post/{{postId}}",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"post",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"if (jsonData.hasOwnProperty(\"id\")) {",
+									"    pm.collectionVariables.set(\"commentId\", jsonData.id);",
+									"}",
+									"",
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"author\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"publication_datetime\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"text\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"id\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"title\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"post\": {",
+									"      \"type\": \"integer\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"author\",",
+									"    \"publication_datetime\",",
+									"    \"text\",",
+									"    \"id\",",
+									"    \"title\",",
+									"    \"post\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"yourcommenttitle\",\n    \"content\": \"yourcommenttext\",\n    \"post\": {{postId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/comments",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"author\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"publication_datetime\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"text\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"id\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"title\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"post\": {",
+									"      \"type\": \"integer\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"author\",",
+									"    \"publication_datetime\",",
+									"    \"text\",",
+									"    \"id\",",
+									"    \"title\",",
+									"    \"post\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/comment/{{commentId}}",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"comment",
+								"{{commentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSchema = {",
+									"  \"type\": \"array\",",
+									"  \"items\": [",
+									"    {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"author\": {",
+									"          \"type\": \"integer\"",
+									"        },",
+									"        \"publication_datetime\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"text\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"id\": {",
+									"          \"type\": \"integer\"",
+									"        },",
+									"        \"title\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"post\": {",
+									"          \"type\": \"integer\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"author\",",
+									"        \"publication_datetime\",",
+									"        \"text\",",
+									"        \"id\",",
+									"        \"title\",",
+									"        \"post\"",
+									"      ]",
+									"    }",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/comments",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Put comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSchema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"message\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"type\": {",
+									"      \"type\": \"string\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"message\",",
+									"    \"type\"",
+									"  ]",
+									"};",
+									"",
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response matches JSON schema', () => {",
+									"    pm.response.to.have.jsonSchema(expectedSchema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"yourdsadsadsafname\",\n    \"content\": \"yournewpfasdsadasdsadsadontent\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/comment/{{commentId}}",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"comment",
+								"{{commentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/comment/{{commentId}}",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"comment",
+								"{{commentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response matches status code\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://hr.recruit.liis.su/qa0/v1/api/{{tester}}/post/{{postId}}",
+							"protocol": "https",
+							"host": [
+								"hr",
+								"recruit",
+								"liis",
+								"su"
+							],
+							"path": [
+								"qa0",
+								"v1",
+								"api",
+								"{{tester}}",
+								"post",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Регресс тесты для первой версии приложения",
+			"auth": {
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "{{password}}",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "{{username}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "LIIS Test v.2",
+			"item": [
+				{
+					"name": "Basics",
+					"item": [
+						{
+							"name": "sign-in",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"let req = JSON.parse(pm.request.body);",
+											"",
+											"if (jsonData.hasOwnProperty(\"id\")) {",
+											"    pm.collectionVariables.set(\"userId\", jsonData.id);",
+											"    pm.collectionVariables.set(\"username\", req.username);",
+											"    pm.collectionVariables.set(\"email\", req.email);",
+											"    pm.collectionVariables.set(\"password\", req.password);",
+											"}",
+											"",
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"password\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"first_name\": {",
+											"      \"type\": \"null\"",
+											"    },",
+											"    \"is_admin\": {",
+											"      \"type\": \"boolean\"",
+											"    },",
+											"    \"last_name\": {",
+											"      \"type\": \"null\"",
+											"    },",
+											"    \"id\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"username\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"middle_name\": {",
+											"      \"type\": \"null\"",
+											"    },",
+											"    \"email\": {",
+											"      \"type\": \"string\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"password\",",
+											"    \"first_name\",",
+											"    \"is_admin\",",
+											"    \"last_name\",",
+											"    \"id\",",
+											"    \"username\",",
+											"    \"middle_name\",",
+											"    \"email\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomExampleEmail}}\",\n    \"password\": \"{{$randomPassword}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api//{{tester}}/sign-in",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"",
+										"{{tester}}",
+										"sign-in"
+									]
+								},
+								"description": "Required fields: username, email, password.\nOptional fields: first_name, middle_name, last_name."
+							},
+							"response": []
+						},
+						{
+							"name": "Post post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"if (jsonData.hasOwnProperty(\"id\")) {",
+											"    pm.collectionVariables.set(\"postId\", jsonData.id);",
+											"}",
+											"",
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"content\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"author\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"publication_datetime\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"name\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"id\": {",
+											"      \"type\": \"integer\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"content\",",
+											"    \"author\",",
+											"    \"publication_datetime\",",
+											"    \"name\",",
+											"    \"id\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"postname\",\n    \"content\": \"postcontent\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"posts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"author\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"content\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"id\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"name\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"publication_datetime\": {",
+											"      \"type\": \"string\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"author\",",
+											"    \"content\",",
+											"    \"id\",",
+											"    \"name\",",
+											"    \"publication_datetime\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"post",
+										"{{postId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get posts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"array\",",
+											"  \"items\": [",
+											"    {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"content\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"author\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"publication_datetime\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"name\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"id\": {",
+											"          \"type\": \"integer\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"content\",",
+											"        \"author\",",
+											"        \"publication_datetime\",",
+											"        \"name\",",
+											"        \"id\"",
+											"      ]",
+											"    }",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"posts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"message\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"type\": {",
+											"      \"type\": \"string\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"message\",",
+											"    \"type\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"yournewpostname\",\n    \"content\": \"yournewpostcontent\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"post",
+										"{{postId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get posts pagination",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"array\",",
+											"  \"items\": [",
+											"    {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"content\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"author\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"publication_datetime\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"name\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"id\": {",
+											"          \"type\": \"integer\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"content\",",
+											"        \"author\",",
+											"        \"publication_datetime\",",
+											"        \"name\",",
+											"        \"id\"",
+											"      ]",
+											"    }",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts?page=1",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"posts"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Post comment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"if (jsonData.hasOwnProperty(\"id\")) {",
+											"    pm.collectionVariables.set(\"commentId\", jsonData.id);",
+											"}",
+											"",
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"author\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"publication_datetime\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"text\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"id\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"title\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"post\": {",
+											"      \"type\": \"integer\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"author\",",
+											"    \"publication_datetime\",",
+											"    \"text\",",
+											"    \"id\",",
+											"    \"title\",",
+											"    \"post\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"yourcommenttitle\",\n    \"text\": \"yourcommenttext\",\n    \"post\": {{postId}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get comment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"author\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"publication_datetime\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"text\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"id\": {",
+											"      \"type\": \"integer\"",
+											"    },",
+											"    \"title\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"post\": {",
+											"      \"type\": \"integer\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"author\",",
+											"    \"publication_datetime\",",
+											"    \"text\",",
+											"    \"id\",",
+											"    \"title\",",
+											"    \"post\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"comment",
+										"{{commentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get comments",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"array\",",
+											"  \"items\": [",
+											"    {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"author\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"publication_datetime\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"text\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"id\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"title\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"post\": {",
+											"          \"type\": \"integer\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"author\",",
+											"        \"publication_datetime\",",
+											"        \"text\",",
+											"        \"id\",",
+											"        \"title\",",
+											"        \"post\"",
+											"      ]",
+											"    }",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put comment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"message\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"type\": {",
+											"      \"type\": \"string\"",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"message\",",
+											"    \"type\"",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"yourdsadsadsafname\",\n    \"text\": \"yournewpfasdsadasdsadsadontent\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"comment",
+										"{{commentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get comments pagination",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const expectedSchema = {",
+											"  \"type\": \"array\",",
+											"  \"items\": [",
+											"    {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"author\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"publication_datetime\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"text\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"id\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"title\": {",
+											"          \"type\": \"string\"",
+											"        },",
+											"        \"post\": {",
+											"          \"type\": \"integer\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"author\",",
+											"        \"publication_datetime\",",
+											"        \"text\",",
+											"        \"id\",",
+											"        \"title\",",
+											"        \"post\"",
+											"      ]",
+											"    }",
+											"  ]",
+											"};",
+											"",
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response matches JSON schema', () => {",
+											"    pm.response.to.have.jsonSchema(expectedSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments?page=1",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"comments"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete comment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"comment",
+										"{{commentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"response matches status code\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+									"protocol": "https",
+									"host": [
+										"hr",
+										"recruit",
+										"liis",
+										"su"
+									],
+									"path": [
+										"qa0",
+										"v2",
+										"api",
+										"{{tester}}",
+										"post",
+										"{{postId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Базовый функционал",
+					"auth": {
+						"type": "basic",
+						"basic": [
+							{
+								"key": "password",
+								"value": "{{password}}",
+								"type": "string"
+							},
+							{
+								"key": "username",
+								"value": "{{username}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Administration",
+					"item": [
+						{
+							"name": "Create post",
+							"item": [
+								{
+									"name": "sign-in",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"let req = JSON.parse(pm.request.body);",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"userId\", jsonData.id);",
+													"    pm.collectionVariables.set(\"username\", req.username);",
+													"    pm.collectionVariables.set(\"email\", req.email);",
+													"    pm.collectionVariables.set(\"password\", req.password);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"password\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"first_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"is_admin\": {",
+													"      \"type\": \"boolean\"",
+													"    },",
+													"    \"last_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"username\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"middle_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"email\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"password\",",
+													"    \"first_name\",",
+													"    \"is_admin\",",
+													"    \"last_name\",",
+													"    \"id\",",
+													"    \"username\",",
+													"    \"middle_name\",",
+													"    \"email\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomExampleEmail}}\",\n    \"password\": \"{{$randomPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api//{{tester}}/sign-in",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"",
+												"{{tester}}",
+												"sign-in"
+											]
+										},
+										"description": "Required fields: username, email, password.\nOptional fields: first_name, middle_name, last_name."
+									},
+									"response": []
+								},
+								{
+									"name": "Post post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"postId\", jsonData.id);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"content\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"name\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"content\",",
+													"    \"author\",",
+													"    \"publication_datetime\",",
+													"    \"name\",",
+													"    \"id\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"postname\",\n    \"content\": \"postcontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"posts"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Post comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"commentId\", jsonData.id);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"text\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"title\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"post\": {",
+													"      \"type\": \"integer\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"author\",",
+													"    \"publication_datetime\",",
+													"    \"text\",",
+													"    \"id\",",
+													"    \"title\",",
+													"    \"post\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"yourcommenttitle\",\n    \"text\": \"yourcommenttext\",\n    \"post\": {{postId}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comments"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "{{password}}",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "{{username}}",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Edit post (no rights)",
+							"item": [
+								{
+									"name": "sign-in (\"admin\")",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"let req = JSON.parse(pm.request.body);",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"adminId\", jsonData.id);",
+													"    pm.collectionVariables.set(\"adminUsername\", req.username);",
+													"    pm.collectionVariables.set(\"adminEmail\", req.email);",
+													"    pm.collectionVariables.set(\"adminPassword\", req.password);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"password\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"first_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"is_admin\": {",
+													"      \"type\": \"boolean\"",
+													"    },",
+													"    \"last_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"username\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"middle_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"email\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"password\",",
+													"    \"first_name\",",
+													"    \"is_admin\",",
+													"    \"last_name\",",
+													"    \"id\",",
+													"    \"username\",",
+													"    \"middle_name\",",
+													"    \"email\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomExampleEmail}}\",\n    \"password\": \"{{$randomPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api//{{tester}}/sign-in",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"",
+												"{{tester}}",
+												"sign-in"
+											]
+										},
+										"description": "Required fields: username, email, password.\nOptional fields: first_name, middle_name, last_name."
+									},
+									"response": []
+								},
+								{
+									"name": "Get post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"content\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"name\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"author\",",
+													"    \"content\",",
+													"    \"id\",",
+													"    \"name\",",
+													"    \"publication_datetime\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get posts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"content\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"name\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"content\",",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"name\",",
+													"        \"id\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"posts"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get posts pagination",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"content\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"name\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"content\",",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"name\",",
+													"        \"id\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts?page=1",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"posts"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"text\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"title\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"post\": {",
+													"      \"type\": \"integer\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"author\",",
+													"    \"publication_datetime\",",
+													"    \"text\",",
+													"    \"id\",",
+													"    \"title\",",
+													"    \"post\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get comments",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"text\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"title\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"post\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"text\",",
+													"        \"id\",",
+													"        \"title\",",
+													"        \"post\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get comments pagination",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"text\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"title\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"post\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"text\",",
+													"        \"id\",",
+													"        \"title\",",
+													"        \"post\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments?page=1",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comments"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Put post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"message\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"type\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"message\",",
+													"    \"type\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"yournewpostname\",\n    \"content\": \"yournewpostcontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Put comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"message\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"type\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"message\",",
+													"    \"type\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"yourdsadsadsafname\",\n    \"text\": \"yournewpfasdsadasdsadsadontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "{{adminPassword}}",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "{{adminUsername}}",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Grant admin (no rights)",
+							"item": [
+								{
+									"name": "Grant user admin role",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"user_id\": {{adminId}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/make_admin",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"make_admin"
+											]
+										},
+										"description": "Grant user admin role so that he can put and delete foreign entities."
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "{{adminPassword}}",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "{{adminUsername}}",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Grant admin (rights)",
+							"item": [
+								{
+									"name": "Grant user admin role",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"user_id\": {{adminId}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/make_admin",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"make_admin"
+											]
+										},
+										"description": "Grant user admin role so that he can put and delete foreign entities."
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "123",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "admin",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Edit post (rights)",
+							"item": [
+								{
+									"name": "Get post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"content\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"name\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"author\",",
+													"    \"content\",",
+													"    \"id\",",
+													"    \"name\",",
+													"    \"publication_datetime\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get posts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"content\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"name\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"content\",",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"name\",",
+													"        \"id\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"posts"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get posts pagination",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"content\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"name\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"content\",",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"name\",",
+													"        \"id\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts?page=1",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"posts"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"text\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"title\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"post\": {",
+													"      \"type\": \"integer\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"author\",",
+													"    \"publication_datetime\",",
+													"    \"text\",",
+													"    \"id\",",
+													"    \"title\",",
+													"    \"post\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get comments",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"text\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"title\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"post\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"text\",",
+													"        \"id\",",
+													"        \"title\",",
+													"        \"post\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get comments pagination",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"array\",",
+													"  \"items\": [",
+													"    {",
+													"      \"type\": \"object\",",
+													"      \"properties\": {",
+													"        \"author\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"publication_datetime\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"text\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"id\": {",
+													"          \"type\": \"integer\"",
+													"        },",
+													"        \"title\": {",
+													"          \"type\": \"string\"",
+													"        },",
+													"        \"post\": {",
+													"          \"type\": \"integer\"",
+													"        }",
+													"      },",
+													"      \"required\": [",
+													"        \"author\",",
+													"        \"publication_datetime\",",
+													"        \"text\",",
+													"        \"id\",",
+													"        \"title\",",
+													"        \"post\"",
+													"      ]",
+													"    }",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments?page=1",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comments"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Put post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"message\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"type\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"message\",",
+													"    \"type\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"yournewpostname\",\n    \"content\": \"yournewpostcontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Put comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"message\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"type\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"message\",",
+													"    \"type\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"yourdsadsadsafname\",\n    \"text\": \"yournewpfasdsadasdsadsadontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "123",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "admin",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					],
+					"description": "Тестирование функционала модератора",
+					"auth": {
+						"type": "basic",
+						"basic": [
+							{
+								"key": "password",
+								"value": "{{adminPassword}}",
+								"type": "string"
+							},
+							{
+								"key": "username",
+								"value": "{{adminUsername}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Bugs",
+					"item": [
+						{
+							"name": "Setup",
+							"item": [
+								{
+									"name": "sign-in",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"let req = JSON.parse(pm.request.body);",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"userId\", jsonData.id);",
+													"    pm.collectionVariables.set(\"username\", req.username);",
+													"    pm.collectionVariables.set(\"email\", req.email);",
+													"    pm.collectionVariables.set(\"password\", req.password);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"password\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"first_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"is_admin\": {",
+													"      \"type\": \"boolean\"",
+													"    },",
+													"    \"last_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"username\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"middle_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"email\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"password\",",
+													"    \"first_name\",",
+													"    \"is_admin\",",
+													"    \"last_name\",",
+													"    \"id\",",
+													"    \"username\",",
+													"    \"middle_name\",",
+													"    \"email\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomExampleEmail}}\",\n    \"password\": \"{{$randomPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api//{{tester}}/sign-in",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"",
+												"{{tester}}",
+												"sign-in"
+											]
+										},
+										"description": "Required fields: username, email, password.\nOptional fields: first_name, middle_name, last_name."
+									},
+									"response": []
+								},
+								{
+									"name": "Post post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"postId\", jsonData.id);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"content\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"name\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"content\",",
+													"    \"author\",",
+													"    \"publication_datetime\",",
+													"    \"name\",",
+													"    \"id\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"postname\",\n    \"content\": \"postcontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/posts",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"posts"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Post comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"commentId\", jsonData.id);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"author\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"publication_datetime\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"text\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"title\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"post\": {",
+													"      \"type\": \"integer\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"author\",",
+													"    \"publication_datetime\",",
+													"    \"text\",",
+													"    \"id\",",
+													"    \"title\",",
+													"    \"post\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"yourcommenttitle\",\n    \"text\": \"yourcommenttext\",\n    \"post\": {{postId}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comments",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "sign-in (\"admin\")",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let jsonData = pm.response.json();",
+													"let req = JSON.parse(pm.request.body);",
+													"",
+													"if (jsonData.hasOwnProperty(\"id\")) {",
+													"    pm.collectionVariables.set(\"adminId\", jsonData.id);",
+													"    pm.collectionVariables.set(\"adminUsername\", req.username);",
+													"    pm.collectionVariables.set(\"adminEmail\", req.email);",
+													"    pm.collectionVariables.set(\"adminPassword\", req.password);",
+													"}",
+													"",
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"password\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"first_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"is_admin\": {",
+													"      \"type\": \"boolean\"",
+													"    },",
+													"    \"last_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"id\": {",
+													"      \"type\": \"integer\"",
+													"    },",
+													"    \"username\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"middle_name\": {",
+													"      \"type\": \"null\"",
+													"    },",
+													"    \"email\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"password\",",
+													"    \"first_name\",",
+													"    \"is_admin\",",
+													"    \"last_name\",",
+													"    \"id\",",
+													"    \"username\",",
+													"    \"middle_name\",",
+													"    \"email\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomExampleEmail}}\",\n    \"password\": \"{{$randomPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api//{{tester}}/sign-in",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"",
+												"{{tester}}",
+												"sign-in"
+											]
+										},
+										"description": "Required fields: username, email, password.\nOptional fields: first_name, middle_name, last_name."
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "{{password}}",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "{{username}}",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Bug №1: Admin can not grant admin rights",
+							"item": [
+								{
+									"name": "Grant user admin role",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"user_id\": {{adminId}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/make_admin",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"make_admin"
+											]
+										},
+										"description": "Grant user admin role so that he can put and delete foreign entities."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Bug №2: Admin can not put post",
+							"item": [
+								{
+									"name": "Put post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"message\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"type\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"message\",",
+													"    \"type\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"yournewpostname\",\n    \"content\": \"yournewpostcontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "123",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "admin",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Bug №3: Admin can not put comment",
+							"item": [
+								{
+									"name": "Put comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const expectedSchema = {",
+													"  \"type\": \"object\",",
+													"  \"properties\": {",
+													"    \"message\": {",
+													"      \"type\": \"string\"",
+													"    },",
+													"    \"type\": {",
+													"      \"type\": \"string\"",
+													"    }",
+													"  },",
+													"  \"required\": [",
+													"    \"message\",",
+													"    \"type\"",
+													"  ]",
+													"};",
+													"",
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response matches JSON schema', () => {",
+													"    pm.response.to.have.jsonSchema(expectedSchema);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"yourdsadsadsafname\",\n    \"text\": \"yournewpfasdsadasdsadsadontent\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "123",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "admin",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Bug №4: Admin can not delete comment",
+							"item": [
+								{
+									"name": "Delete comment",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/comment/{{commentId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"comment",
+												"{{commentId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "123",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "admin",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Bug №5: User can delete another user's post without admin rights",
+							"item": [
+								{
+									"name": "Delete post",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response matches status code\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://hr.recruit.liis.su/qa0/v2/api/{{tester}}/post/{{postId}}",
+											"protocol": "https",
+											"host": [
+												"hr",
+												"recruit",
+												"liis",
+												"su"
+											],
+											"path": [
+												"qa0",
+												"v2",
+												"api",
+												"{{tester}}",
+												"post",
+												"{{postId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "basic",
+								"basic": [
+									{
+										"key": "password",
+										"value": "{{adminPassword}}",
+										"type": "string"
+									},
+									{
+										"key": "username",
+										"value": "{{adminUsername}}",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					],
+					"description": "Запросы для воспроизведения обнаруженных багов"
+				}
+			],
+			"description": "Тесты второй версии приложения",
+			"auth": {
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "123",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "admin",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "123",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "tester",
+			"value": "tester@example.com",
+			"type": "string"
+		},
+		{
+			"key": "postId",
+			"value": ""
+		},
+		{
+			"key": "commentId",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "adminId",
+			"value": ""
+		},
+		{
+			"key": "adminUsername",
+			"value": ""
+		},
+		{
+			"key": "adminEmail",
+			"value": ""
+		},
+		{
+			"key": "adminPassword",
+			"value": ""
+		}
+	]
+}
